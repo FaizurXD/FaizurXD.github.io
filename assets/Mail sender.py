@@ -1,85 +1,82 @@
 import time
-import brevo
-from brevo import ApiClient
-from brevo.model.send_smtp_email import SendSmtpEmail
-from brevo.api.smtp_api import SMTPApi
-from brevo.exceptions import ApiException
+import sib_api_v3_sdk
+from sib_api_v3_sdk.rest import ApiException
 from faker import Faker
+from pprint import pprint
 
-# Initialize the API client with your Brevo (Sendinblue) API key
-configuration = brevo.Configuration()
-configuration.api_key['api-key'] = 'YOUR_API_KEY'  # Replace with your actual API key
-
-# Create an instance of the SMTP API
-api_instance = SMTPApi(ApiClient(configuration))
-
-# Initialize the Faker object for generating fake Muslim names
+# Setup Faker for generating fake Muslim names
 fake = Faker()
 
+# Generate a fake Muslim name
 def generate_fake_muslim_name():
-    """Generate a fake Muslim name."""
     return fake.first_name_male() + " " + fake.last_name()
 
-def send_email(to_email, subject, content):
-    """Send the email using Brevo API."""
-    email = SendSmtpEmail(
-        to=[{"email": to_email}],
+# Function to send email via Brevo's API
+def send_email(recipient_email, sender_name, sender_email, subject, html_content):
+    # Setup the Brevo API client
+    configuration = sib_api_v3_sdk.Configuration()
+    configuration.api_key['api-key'] = 'YOUR_API_V3_KEY'  # Replace with your actual Brevo API key
+
+    # Create API instance
+    api_instance = sib_api_v3_sdk.TransactionalEmailsApi(sib_api_v3_sdk.ApiClient(configuration))
+    
+    # Create the email content
+    email = sib_api_v3_sdk.SendSmtpEmail(
+        to=[{"email": recipient_email}],
+        sender={"name": sender_name, "email": sender_email},
         subject=subject,
-        html_content=f"<html><body>{content}</body></html>"
+        html_content=html_content
     )
 
     try:
+        # Send the email via Brevo API
         api_response = api_instance.send_transac_email(email)
-        print(f"Email sent to {to_email}, Response: {api_response}")
+        pprint(api_response)
     except ApiException as e:
-        print(f"Error sending email to {to_email}: {e}")
+        print(f"Exception when sending email to {recipient_email}: {e}")
 
-def load_recipients(filename):
-    """Load recipients from a text file."""
-    with open(filename, "r") as file:
-        return [line.strip() for line in file if line.strip()]
+# Function to send emails repeatedly with a delay
+def send_emails_with_gap(recipient_email, sender_name, sender_email, base_subject, base_html_content, times, delay_seconds=5):
+    for i in range(times):
+        # Generate a fake Muslim name
+        fake_name = generate_fake_muslim_name()
 
-# Load recipients from the text file
-recipients = load_recipients("recipients.txt")
+        # Create the subject and body with the generated name
+        subject = base_subject.replace("{generate_fake_muslims_names}", fake_name)
+        html_content = base_html_content.replace("{generate_fake_muslims_names}", fake_name)
 
-# Content template for the email
-content_template = """
-In response to the public notification in context to Waqf Amendment Bill 2024, I strongly suggest it to be rolled back for the following reasons listed below:
+        # Send the email
+        send_email(recipient_email, sender_name, sender_email, subject, html_content)
 
-1. The Bill is maliciously designed to target the Muslim Community and to usurp or destroy the Waqf properties. The Bill was framed without consulting the Stakeholders (Muslims).
+        print(f"Email {i+1} sent to {recipient_email}. Waiting for {delay_seconds} seconds...")
+        # Wait for the specified delay
+        time.sleep(delay_seconds)
 
-2. The concept of Waqf emerges from Islamic religious belief where a Waqif dedicates his/her self-acquired or inherited private property in the name of God for charitable purposes. However, the proposed Bill seeks to dismantle the salient features of the meticulously developed centuries-old waqf.
+# Main block to execute email sending
+if __name__ == "__main__":
+    # Specify recipient email, sender details, and number of emails to send
+    recipient_email = "recipient@example.com"  # Replace with the recipient's email
+    sender_name = "Your Name"
+    sender_email = "yourname@yourdomain.com"  # Replace with your sender email
+    times_to_send = 10  # Number of times to send the email
 
-3. The role and powers given to the Collector as per the proposed Bill in the administration of Waqf properties is highly objectionable, as if the Collector will virtually take over the whole Waqf Administration, against the Waqf Board and Central Waqf Council. 
+    # Email subject and content template
+    subject_template = "I, {generate_fake_muslims_names}, Reject Waqf Amendment Bill 2024"
+    html_content_template = """
+    <p>In response to the public notification in context to Waqf Amendment Bill 2024, I strongly suggest it to be rolled back for the following reasons listed below:</p>
 
-As per the proposed Bill, the Collector can re-open any waqf, even old and notified waqfs, and determine whether the property is government property or not. These provisions are autocratic and highly unsecular.
+    <ol>
+        <li>The Bill is maliciously designed to target the Muslim Community and to usurp or destroy the Waqf properties. The Bill was framed without consulting the stakeholders (Muslims).</li>
+        <li>The concept of Waqf emerges from Islamic religious belief where a Waqif dedicates his/her self-acquired or inherited private property in the name of God for charity purposes. However, the proposed Bill seeks to dismantle the salient features of the meticulously developed centuries-old Waqf.</li>
+        <li>The role and powers given to the Collector as per the proposed Bill in the administration of Waqf properties are highly objectionable. It is as if the Collector will virtually take over the whole Waqf Administration against the Waqf board and Central Waqf Council.</li>
+        <li>The Bill authorizes the government to nominate members to the Waqf board. The proposed changes seek to amend the constitution of the central Waqf council and the Waqf board by allowing a majority of non-Muslims. This is not only undemocratic but also discriminatory.</li>
+        <li>The Bill violates the rights of Waqf properties and is unconstitutional as it interferes with the fundamental rights provided in Articles 25, 26, and 29 of the Indian Constitution.</li>
+        <li>The provisions for deleting protection from the Limitation Act, curtailing powers of the Waqf Tribunal, and giving control to the government over the Waqf board are against democratic principles.</li>
+        <li>There are several discriminatory clauses, such as the involvement of the Collector in Waqf matters, which are not applicable to Hindu Endowments under the Hindu Endowment Act.</li>
+    </ol>
 
-4. The Bill aims to dismantle the concept of Waqf by user, which is the essence of Waqf jurisprudence, endangering mosques, dargahs, and Qabrastans. The deletion of Waqf by user is also unconstitutional.
+    <p>Yours sincerely,<br>{generate_fake_muslims_names}</p>
+    """
 
-5. The Bill authorizes the government to nominate members to the Waqf board and amend the constitution of the Central Waqf Council, allowing non-Muslim members. This is undemocratic and discriminatory.
-
-6. The deletion of protection from the Limitation Act is also discriminatory. Similar protection exists in the Hindu Endowment Act.
-
-7. The curtailing of the powers of the Waqf Tribunal is also discriminatory.
-
-8. The proposed amendments violate Articles 25, 26, 29, and 14 of the Indian Constitution.
-
-Yours sincerely,
-{name}
-"""
-
-# Loop through each recipient and send an email with a 5-second delay
-for recipient in recipients:
-    # Generate a fake Muslim name for the subject and content
-    fake_name = generate_fake_muslim_name()
-    
-    # Prepare the subject and content with the generated name
-    subject = f"I, {fake_name}, Reject Waqf Amendment Bill 2024"
-    content = content_template.format(name=fake_name)
-    
-    # Send the email
-    send_email(recipient, subject, content)
-    
-    # Wait for 5 seconds before sending the next email
-    print(f"Waiting for 5 seconds before sending the next email...")
-    time.sleep(5)
+    # Call the function to send emails
+    send_emails_with_gap(recipient_email, sender_name, sender_email, subject_template, html_content_template, times_to_send, delay_seconds=5)
