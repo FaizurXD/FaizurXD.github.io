@@ -1,0 +1,294 @@
+You are a Senior Product Architect + Blockchain Engineer + Full-Stack Developer.
+Your task is to design a production-ready clipping campaign platform where businesses post campaigns and users earn money by submitting video clips.
+
+
+---
+
+🧠 Platform Concept (Core Idea)
+
+Build a clipping website where:
+
+Businesses/creators (Campaign Owners) create campaigns
+
+Users (Clippers) join campaigns, submit clips, and get paid
+
+All payments happen in crypto
+
+Funds are locked upfront in a custodial wallet per campaign to prevent scams
+
+
+
+---
+
+👥 User Roles
+
+1. Admin (Platform Owner)
+
+
+2. Campaign Owner (Business / Creator)
+
+
+3. User / Clipper
+
+
+
+
+---
+
+🏗️ Campaign Creation Flow
+
+When a Campaign Owner creates a campaign, they must:
+
+Define:
+
+Campaign title & description
+
+Platform type (YouTube Shorts, Instagram Reels, TikTok, etc.)
+
+Clip requirements (length, format, rules)
+
+Payment per clip
+
+Maximum number of clips
+
+Campaign deadline
+
+
+Deposit full campaign budget upfront
+
+Budget = (payment per clip × max clips) + platform fee
+
+
+Funds go into a campaign-specific custodial wallet
+
+Campaign becomes active only after funds are deposited
+
+
+⚠️ Campaign owners cannot withdraw funds once the campaign is live unless:
+
+Campaign expires
+
+Remaining unused funds are refundable
+
+
+
+---
+
+💼 Wallet & Crypto Requirements
+
+Supported wallets: MetaMask, WalletConnect, Phantom (if Solana), etc.
+
+Users must connect their wallet before joining any campaign
+
+Each campaign has:
+
+A custodial smart contract wallet
+
+Locked funds until payout conditions are met
+
+
+Platform earns a fixed or percentage fee
+
+
+
+---
+
+🎬 User (Clipper) Flow
+
+1. User connects crypto wallet
+
+
+2. User browses live campaigns
+
+
+3. User joins a campaign
+
+
+4. User submits:
+
+Clip file or link
+
+Proof of upload (URL)
+
+
+
+5. User requests payment
+
+
+6. Payment status:
+
+Pending
+
+Approved
+
+Rejected
+
+
+
+
+
+---
+
+💸 Payment Approval Logic (Anti-Scam System)
+
+Option 1: Campaign Owner Approval
+
+Owner reviews clip
+
+Accepts → smart contract auto-pays user
+
+Rejects → must provide reason
+
+
+Option 2: Admin Escalation (Fail-Safe)
+
+If owner:
+
+Ignores requests
+
+Tries to scam
+
+
+Admin reviews:
+
+Clip validity
+
+Campaign rules
+
+
+Admin can force-approve payout
+
+Payment auto-sent from custodial wallet
+
+
+🚫 Owners cannot block payments unfairly
+
+
+---
+
+🔐 Smart Contract Requirements
+
+Custodial wallet per campaign
+
+Funds locked at campaign creation
+
+Auto-payment on approval
+
+Admin override permission
+
+Transparent on-chain records
+
+Emergency pause mechanism
+
+
+
+---
+
+🧾 Platform Features (Mandatory)
+
+Authentication & Accounts
+
+Wallet-based login
+
+Optional email/username for dashboard
+
+
+Campaign System
+
+Campaign creation & management
+
+Live / Paused / Ended states
+
+Remaining budget tracker
+
+
+Submission System
+
+Clip uploads or links
+
+Review dashboard
+
+Status tracking
+
+
+Payments
+
+Automatic crypto payouts
+
+Transaction history
+
+Gas fee handling logic
+
+
+Admin Dashboard
+
+View all campaigns
+
+Approve disputed payments
+
+Freeze malicious users
+
+View platform earnings
+
+
+Security & Trust
+
+Anti-spam detection
+
+Duplicate clip detection
+
+Rate limiting
+
+KYC optional toggle (for future)
+
+
+
+---
+
+📊 Transparency & Analytics
+
+On-chain payment proofs
+
+Campaign performance stats
+
+User earnings dashboard
+
+Owner spend reports
+
+
+
+---
+
+⚙️ Tech Stack Suggestions (Optional but Preferred)
+
+Frontend: React / Next.js
+
+Backend: Node.js / NestJS
+
+Database: PostgreSQL
+
+Blockchain: EVM (Polygon / Arbitrum / Base)
+
+Smart Contracts: Solidity
+
+Wallets: WalletConnect, MetaMask
+
+Storage: IPFS / Cloudflare R2 / AWS S3
+
+
+
+---
+
+🎯 Final Objective
+
+Design this platform so that:
+
+Users cannot be scammed
+
+Funds are guaranteed before work starts
+
+Payments are automatic and transparent
+
+Admin has final authority as a trust layer
+
+Platform is scalable, secure, and crypto-native
